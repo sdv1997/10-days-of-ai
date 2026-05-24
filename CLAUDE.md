@@ -61,6 +61,23 @@ Resumen:
 
 Python 3.12, pandas, NumPy, scikit-learn, LightGBM, CatBoost, PyTorch (en pod cuando toque NN/CV), matplotlib. Sin frameworks pesados.
 
+## Día 3 — cerrado
+
+**What's Up, Docs?** (DrivenData, generación de abstracts de papers de ciencias sociales). Detalle completo en [day_03/README.md](day_03/README.md).
+
+Resumen:
+- **Resultado final: ROUGE-2 0.1398 público, rank #9 / 495.**
+- Modelo: Qwen2.5-7B-Instruct-AWQ (4-bit, ~4.4 GB), inferencia via vLLM en A5000.
+- La mejora clave fue aumentar el contexto de 6000 → 24.000 chars (+0.014 ROUGE-2), no el cambio de modelo.
+- `HF_HOME=/workspace/.cache/huggingface` obligatorio para no llenar el overlay raíz de 20 GB.
+
+## Lo que aprendí en Día 3 (lecciones transferibles)
+
+- **En summarización, el contexto importa más que el tamaño del modelo.** Pasar de 6000 a 24.000 chars (+0.014) superó con creces cambiar de 3B a 7B (+0.0004). Truncar la conclusión del paper es perder la mitad de la información relevante.
+- **AWQ 4-bit** reduce pesos de ~15 GB a ~4.4 GB con pérdida mínima en tareas generativas. Útil cuando el almacenamiento es el cuello de botella, no la calidad.
+- **vLLM** con batching: 345 papers en ~30s en A5000. La latencia real es el warmup/compilación (~2 min), no la inferencia.
+- **Gestión de caché HuggingFace en RunPod:** siempre redirigir con `HF_HOME=/workspace/.cache/huggingface`. El overlay raíz tiene solo 20 GB y `pip install vllm` ya consume ~12 GB de eso.
+
 ## Lo que aprendí en Día 2 (lecciones transferibles)
 
 - **En camera trap classification, MegaDetector primero siempre.** Recortar al animal elimina el fondo site-específico y es la mejora más grande posible. Sin él el modelo aprende el entorno, no el animal.
